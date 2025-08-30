@@ -20,7 +20,7 @@ on:
         required: false
         default: 'false'
       SKIP_GHCR:
-        description: 'Set to true to skip pushing to GHCR (default: true)'
+        description: 'Set to true to sklp pushing to GHCR (default: true)'
         required: false
         default: 'true'
       WEBCLIENT_SOURCE_LOCATION:

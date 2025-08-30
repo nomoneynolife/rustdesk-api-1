@@ -2,6 +2,11 @@
 
 [English Doc](README_EN.md)
 
+二开日志：
+感谢大佬的开源，特别感谢噢！我在大佬的基础上新增了能够用到的功能
+登录时判断是否用户组，只组中的用户可以登录（不影响管理员组）
+
+
 本项目使用 Go 实现了 RustDesk 的 API，并包含了 Web Admin 和 Web 客户端。RustDesk 是一个远程桌面软件，提供了自托管的解决方案。
 
 <div align=center>

@@ -136,10 +136,6 @@ func (ls *LdapService) Authenticate(username, password string) (*model.User, err
 	if !ldapUser.Enabled {
 		return nil, ErrLdapUserDisabled
 	}
-	// add allow-group check
-	if !ls.isUserAllowed(&Config.Ldap, ldapUser) {
-		return nil, fmt.Errorf("user not in allow-group")
-	}
 	cfg := &Config.Ldap
 	err = ls.verifyCredentials(cfg, ldapUser.Dn, password)
 	if err != nil {
@@ -402,45 +398,6 @@ func (ls *LdapService) baseDnUser(cfg *config.Ldap) string {
 		return cfg.BaseDn
 	}
 	return cfg.User.BaseDn
-}
-
-func (ls *LdapService) isUserAllowed(cfg *config.Ldap, ldapUser *LdapUser) bool {
-	allowGroup := cfg.User.AllowGroup
-	if allowGroup == "" {
-		return true // 不配置表示不限制
-	}
-
-	// 直接检查 memberOf
-	if len(ldapUser.MemberOf) > 0 {
-		for _, group := range ldapUser.MemberOf {
-			if strings.EqualFold(group, allowGroup) {
-				return true
-			}
-		}
-		return false
-	}
-
-	// 如果不是 memberOf，用 member 属性反查
-	member := "member"
-	userDN := ldap.EscapeFilter(ldapUser.Dn)
-	allowGroupDn := ldap.EscapeFilter(allowGroup)
-	groupFilter := fmt.Sprintf("(%s=%s)", member, userDN)
-
-	groupSearchRequest := ldap.NewSearchRequest(
-		allowGroupDn,
-		ldap.ScopeWholeSubtree,
-		ldap.NeverDerefAliases,
-		0, 0, false,
-		groupFilter,
-		[]string{"dn"},
-		nil,
-	)
-
-	groupResult, err := ls.searchResult(cfg, groupSearchRequest)
-	if err != nil {
-		return false
-	}
-	return len(groupResult.Entries) > 0
 }
 
 // isUserAdmin checks if the user is a member of the admin group.

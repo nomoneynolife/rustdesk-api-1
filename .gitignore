@@ -1,4 +1,7 @@
 .idea
+runtime/*
+!runtime
+!runtime/cache/.gitkeep
 go.sum
 resources/admin
 release
